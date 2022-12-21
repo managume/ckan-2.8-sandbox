@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  ckan:
+    container_name: ${COMPOSE_PROJECT_NAME}-ckan
+    build:
+      context: './ckan'
+    ports:
+      - 5000:5000
+    depends_on:
+      - database
+      - solr
+      - redis
+    healthcheck:
+      test: pg_isready -h database
+
+  database:
+    container_name: ${COMPOSE_PROJECT_NAME}-database
+    image: postgres:${POSTGRES_VERSION}
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+
+  solr:
+    container_name: ${COMPOSE_PROJECT_NAME}-solr
+    build:
+      context: './solr'
+
+  redis:
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    image: redis:latest
+
